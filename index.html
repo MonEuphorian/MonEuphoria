@@ -23,6 +23,9 @@
             background-color: #f0f0f0;
             cursor: pointer;
         }
+        #hangman {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +36,13 @@
             <input type="text" id="fillInBlank" placeholder="Type your answer here">
             <button onclick="checkAnswer('fillInBlank')">Submit</button>
         </div>
+    </div>
+    <div id="hangman">
+        <p id="wordToGuess">_ _ _ _</p>
+        <p id="hangmanMessage"></p>
+        <input type="text" id="guessLetter" maxlength="1">
+        <button onclick="guessLetter()">Guess</button>
+        <p>Guessed Letters: <span id="guessedLetters"></span></p>
     </div>
     <script>
         const questions = [
@@ -51,6 +61,11 @@
                 type: 'fill-in-the-blank',
                 text: "What is 2 + 2?",
                 correctAnswer: "4"
+            },
+            {
+                type: 'hangman',
+                text: "Guess the word",
+                word: "CODE"
             }
         ];
 
@@ -75,6 +90,10 @@
                     <input type="text" id="fillInBlank" placeholder="Type your answer here">
                     <button onclick="checkAnswer('fillInBlank')">Submit</button>
                 `;
+            } else if (question.type === 'hangman') {
+                document.querySelector('.choices').innerHTML = '';
+                document.getElementById('hangman').style.display = 'block';
+                startHangmanGame(question.word);
             }
 
             window.checkAnswer = function(answer) {
@@ -89,6 +108,43 @@
                     alert("Correct! You can get out of jail.");
                 } else {
                     alert("Wrong answer! Try again.");
+                }
+            }
+        }
+
+        function startHangmanGame(word) {
+            let guessedLetters = [];
+            let remainingLetters = word.length;
+            let wordToGuess = Array(word.length).fill('_');
+
+            document.getElementById('wordToGuess').innerText = wordToGuess.join(' ');
+
+            window.guessLetter = function() {
+                const letter = document.getElementById('guessLetter').value.toUpperCase();
+                document.getElementById('guessLetter').value = '';
+
+                if (guessedLetters.includes(letter) || letter === '') {
+                    document.getElementById('hangmanMessage').innerText = 'You already guessed that letter or it is invalid.';
+                    return;
+                }
+
+                guessedLetters.push(letter);
+                document.getElementById('guessedLetters').innerText = guessedLetters.join(', ');
+
+                if (word.includes(letter)) {
+                    for (let i = 0; i < word.length; i++) {
+                        if (word[i] === letter) {
+                            wordToGuess[i] = letter;
+                            remainingLetters--;
+                        }
+                    }
+                    document.getElementById('wordToGuess').innerText = wordToGuess.join(' ');
+                } else {
+                    document.getElementById('hangmanMessage').innerText = `The letter ${letter} is not in the word.`;
+                }
+
+                if (remainingLetters === 0) {
+                    document.getElementById('hangmanMessage').innerText = 'Congratulations! You guessed the word.';
                 }
             }
         }
