@@ -45,7 +45,7 @@
     <div id="hangman">
         <p id="wordToGuess">_ _ _ _</p>
         <p id="hangmanMessage"></p>
-        <img id="hangmanImage" src="step0.png">
+        <img id="hangmanImage" src="step1.png">
         <input type="text" id="guessLetter" maxlength="1">
         <button onclick="guessLetter()">Guess</button>
         <p>Guessed Letters: <span id="guessedLetters"></span></p>
@@ -124,13 +124,13 @@
             let wordToGuess = Array(word.length).fill('_');
             let wrongGuesses = 0;
             const hangmanImages = [
-                'step0.png',
                 'step1.png',
                 'step2.png',
                 'step3.png',
                 'step4.png',
                 'step5.png',
-                'step6.png'
+                'step6.png',
+                'step7.png'
             ];
 
             document.getElementById('wordToGuess').innerText = wordToGuess.join(' ');
@@ -163,7 +163,7 @@
 
                 if (remainingLetters === 0) {
                     document.getElementById('hangmanMessage').innerText = 'Congratulations! You guessed the word.';
-                } else if (wrongGuesses === hangmanImages.length - 1) {
+                } else if (wrongGuesses === hangmanImages.length) {
                     document.getElementById('hangmanMessage').innerText = 'Game over! You did not guess the word.';
                 }
             }
