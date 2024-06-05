@@ -3,171 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monopoly Jail Escape</title>
+    <title>Basic Battle Game</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
-        .question {
-            margin-top: 20px;
-        }
-        .choices {
-            margin-top: 20px;
-        }
-        .choice {
-            display: block;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f0f0f0;
-            cursor: pointer;
-        }
-        #hangman {
-            display: none;
-            text-align: center;
-        }
-        #hangman img {
-            width: 150px;
-            margin: 20px auto;
+        canvas {
+            border: 1px solid black;
         }
     </style>
 </head>
 <body>
-    <h1>Monopoly Jail Escape</h1>
-    <div class="question">
-        <p id="questionText">Here will be a question.</p>
-        <div class="choices">
-            <input type="text" id="fillInBlank" placeholder="Type your answer here">
-            <button onclick="checkAnswer('fillInBlank')">Submit</button>
-        </div>
-    </div>
-    <div id="hangman">
-        <p id="wordToGuess">_ _ _ _</p>
-        <p id="hangmanMessage"></p>
-        <img id="hangmanImage" src="step1.png">
-        <input type="text" id="guessLetter" maxlength="1">
-        <button onclick="guessLetter()">Guess</button>
-        <p>Guessed Letters: <span id="guessedLetters"></span></p>
-    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
     <script>
-        const questions = [
-            {
-                type: 'multiple-choice',
-                text: "What is the capital of France?",
-                choices: {
-                    A: "Berlin",
-                    B: "Madrid",
-                    C: "Paris",
-                    D: "Rome"
-                },
-                correctAnswer: "C"
-            },
-            {
-                type: 'fill-in-the-blank',
-                text: "What is 2 + 2?",
-                correctAnswer: "4"
-            },
-            {
-                type: 'hangman',
-                text: "Guess the word",
-                word: "CODE"
-            }
-        ];
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-        function getRandomQuestion() {
-            const randomIndex = Math.floor(Math.random() * questions.length);
-            return questions[randomIndex];
-        }
-
-        window.onload = function() {
-            const question = getRandomQuestion();
-            document.getElementById('questionText').innerText = question.text;
-
-            if (question.type === 'multiple-choice') {
-                document.querySelector('.choices').innerHTML = `
-                    <div class="choice" onclick="checkAnswer('A')">A: ${question.choices.A}</div>
-                    <div class="choice" onclick="checkAnswer('B')">B: ${question.choices.B}</div>
-                    <div class="choice" onclick="checkAnswer('C')">C: ${question.choices.C}</div>
-                    <div class="choice" onclick="checkAnswer('D')">D: ${question.choices.D}</div>
-                `;
-            } else if (question.type === 'fill-in-the-blank') {
-                document.querySelector('.choices').innerHTML = `
-                    <input type="text" id="fillInBlank" placeholder="Type your answer here">
-                    <button onclick="checkAnswer('fillInBlank')">Submit</button>
-                `;
-            } else if (question.type === 'hangman') {
-                document.querySelector('.choices').innerHTML = '';
-                document.getElementById('hangman').style.display = 'block';
-                startHangmanGame(question.word);
+        class Player {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.width = 50;
+                this.height = 50;
+                this.speed = 5;
             }
 
-            window.checkAnswer = function(answer) {
-                let userAnswer;
-                if (question.type === 'multiple-choice') {
-                    userAnswer = answer;
-                } else if (question.type === 'fill-in-the-blank') {
-                    userAnswer = document.getElementById(answer).value.trim();
-                }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
 
-                if (userAnswer === question.correctAnswer) {
-                    alert("Correct! You can get out of jail.");
-                } else {
-                    alert("Wrong answer! Try again.");
-                }
+            moveLeft() {
+                this.x -= this.speed;
+            }
+
+            moveRight() {
+                this.x += this.speed;
+            }
+
+            moveUp() {
+                this.y -= this.speed;
+            }
+
+            moveDown() {
+                this.y += this.speed;
             }
         }
 
-        function startHangmanGame(word) {
-            let guessedLetters = [];
-            let remainingLetters = word.length;
-            let wordToGuess = Array(word.length).fill('_');
-            let wrongGuesses = 0;
-            const hangmanImages = [
-                'step1.png',
-                'step2.png',
-                'step3.png',
-                'step4.png',
-                'step5.png',
-                'step6.png',
-                'step7.png'
-            ];
+        const player = new Player(375, 275, 'blue');
 
-            document.getElementById('wordToGuess').innerText = wordToGuess.join(' ');
-
-            window.guessLetter = function() {
-                const letter = document.getElementById('guessLetter').value.toUpperCase();
-                document.getElementById('guessLetter').value = '';
-
-                if (guessedLetters.includes(letter) || letter === '') {
-                    document.getElementById('hangmanMessage').innerText = 'You already guessed that letter or it is invalid.';
-                    return;
-                }
-
-                guessedLetters.push(letter);
-                document.getElementById('guessedLetters').innerText = guessedLetters.join(', ');
-
-                if (word.includes(letter)) {
-                    for (let i = 0; i < word.length; i++) {
-                        if (word[i] === letter) {
-                            wordToGuess[i] = letter;
-                            remainingLetters--;
-                        }
-                    }
-                    document.getElementById('wordToGuess').innerText = wordToGuess.join(' ');
-                } else {
-                    wrongGuesses++;
-                    document.getElementById('hangmanImage').src = hangmanImages[wrongGuesses];
-                    document.getElementById('hangmanMessage').innerText = `The letter ${letter} is not in the word.`;
-                }
-
-                if (remainingLetters === 0) {
-                    document.getElementById('hangmanMessage').innerText = 'Congratulations! You guessed the word.';
-                } else if (wrongGuesses === hangmanImages.length) {
-                    document.getElementById('hangmanMessage').innerText = 'Game over! You did not guess the word.';
-                }
-            }
-        }
-    </script>
-</body>
-</html>
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas
