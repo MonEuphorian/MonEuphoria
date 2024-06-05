@@ -51,4 +51,19 @@
         const player = new Player(375, 275, 'blue');
 
         function update() {
-            ctx.clearRect(0, 0, canvas.width, canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            player.draw();
+            requestAnimationFrame(update);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') player.moveLeft();
+            if (e.key === 'ArrowRight') player.moveRight();
+            if (e.key === 'ArrowUp') player.moveUp();
+            if (e.key === 'ArrowDown') player.moveDown();
+        });
+
+        update();
+    </script>
+</body>
+</html>
