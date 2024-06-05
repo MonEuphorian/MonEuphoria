@@ -26,6 +26,10 @@
         #hangman {
             display: none;
         }
+        #hangman img {
+            width: 150px;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
@@ -40,6 +44,7 @@
     <div id="hangman">
         <p id="wordToGuess">_ _ _ _</p>
         <p id="hangmanMessage"></p>
+        <img id="hangmanImage" src="https://via.placeholder.com/150">
         <input type="text" id="guessLetter" maxlength="1">
         <button onclick="guessLetter()">Guess</button>
         <p>Guessed Letters: <span id="guessedLetters"></span></p>
@@ -116,6 +121,15 @@
             let guessedLetters = [];
             let remainingLetters = word.length;
             let wordToGuess = Array(word.length).fill('_');
+            let wrongGuesses = 0;
+            const hangmanImages = [
+                'https://via.placeholder.com/150?text=Step+1',
+                'https://via.placeholder.com/150?text=Step+2',
+                'https://via.placeholder.com/150?text=Step+3',
+                'https://via.placeholder.com/150?text=Step+4',
+                'https://via.placeholder.com/150?text=Step+5',
+                'https://via.placeholder.com/150?text=Step+6'
+            ];
 
             document.getElementById('wordToGuess').innerText = wordToGuess.join(' ');
 
@@ -140,11 +154,15 @@
                     }
                     document.getElementById('wordToGuess').innerText = wordToGuess.join(' ');
                 } else {
+                    wrongGuesses++;
+                    document.getElementById('hangmanImage').src = hangmanImages[wrongGuesses];
                     document.getElementById('hangmanMessage').innerText = `The letter ${letter} is not in the word.`;
                 }
 
                 if (remainingLetters === 0) {
                     document.getElementById('hangmanMessage').innerText = 'Congratulations! You guessed the word.';
+                } else if (wrongGuesses === hangmanImages.length) {
+                    document.getElementById('hangmanMessage').innerText = 'Game over! You did not guess the word.';
                 }
             }
         }
